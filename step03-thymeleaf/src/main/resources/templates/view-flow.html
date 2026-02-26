@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Thymeleaf View</title>
+</head>
+<body>
+	<h1>Thymeleaf View Flow</h1>
+	
+	<ul th:each="student : ${students}">
+		<li th:text="${student.sid}"></li>
+		<li th:text="${studentStat.count}"></li>
+	</ul>
+	
+	<div th:if="${score == 100}">100점</div>
+	<div th:unless="${score == 10}">10점</div>
+	
+	<div th:switch="${view.grade.name()}">
+		<th:block th:case="JUNIOR">
+			<p>view는 주니어</p>
+		</th:block>
+		<th:block th:case="SENIOR">
+			<p>view는 시니어</p>
+		</th:block>
+		<th:block th:case="*">
+			<p>view의 grade정보 확인불가</p>
+		</th:block>
+	</div>
+	
+	<!-- Elvis 연산자 -->
+	<div th:text="${score} ?: 0"></div>
+	
+	<div th:text="1 le 10"></div>
+	
+</body>
+</html>

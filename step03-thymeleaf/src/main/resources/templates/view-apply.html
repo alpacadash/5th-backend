@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Thymeleaf View</title>
+</head>
+<body>
+	<h1>Thymeleaf View Apply</h1>
+
+	<!-- 링크 th:href -->
+	<a th:href="@{/view-basic}">view-basic 이동</a>
+
+	<!-- Query String : ?key=value -->
+	<!-- http://localhost:8080/link -->
+	<a th:href="@{/link(sid=${thyme.sid}, sname=${thyme.sname})}">쿼리스트링</a>
+
+
+	<!-- Path Variable : /students/20246001 -->
+	<a th:href="@{/students/{sid}(sid=${thyme.sid})}">경로파라미터</a>
+
+</body>
+</html>
