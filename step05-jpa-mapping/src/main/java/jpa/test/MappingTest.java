@@ -1,5 +1,7 @@
 package jpa.test;
 
+import java.util.List;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -42,13 +44,29 @@ public class MappingTest {
 //		stu.setSname("jpa");
 //		em.persist(stu);
 		
-		Lecture foundLecture = em.find(Student.class, 20242001).getLecture();
-		System.out.println(foundLecture);
-		
-		
+//		Lecture foundLecture = em.find(Student.class, 20242001).getLecture();
+//		System.out.println(foundLecture);
 		
 		// 강좌에 참여하고 있는 학생의 정보 출력?
-
+//		List<Student> students = em.find(Lecture.class, 1L).getStudents();
+//		System.out.println(students);
+		
+		// 이름 기반 파라미터 JPQL
+//		String namedJpql = "select s from Student s where s.lecture.lid = :lid";
+//		List<Student> students = em.createQuery(namedJpql, Student.class)
+//									.setParameter("lid", 1L)
+//									.getResultList();
+		
+//		System.out.println(students);
+		
+		// 위치 기반 파라미터 JPQL
+//		String positionalJpql = "select s from Student s where s.lecture.lid = ?1";
+//		students = em.createQuery(positionalJpql, Student.class)
+//						.setParameter(1, 1L)
+//						.getResultList();
+		
+//		System.out.println(students);
+		
 	}
 
 	public static void main(String[] args) {

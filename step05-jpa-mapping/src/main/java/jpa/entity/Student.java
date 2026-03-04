@@ -10,13 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.ToString.Exclude;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
-@Entity
+@ToString(exclude = {"lecture"})
+//@Entity
 public class Student {
 	@Id
 	@Column(name = "sid")
@@ -27,6 +28,7 @@ public class Student {
 
 	@ManyToOne
 	@JoinColumn(name = "lid")
+//	@Exclude
 	private Lecture lecture;
 	
 //	@Column(name = "lid")
