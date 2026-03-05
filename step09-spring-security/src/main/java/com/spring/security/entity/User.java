@@ -9,11 +9,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
-@Data // 편의상 setter 적용
+@Getter
 @Entity
 @NoArgsConstructor
 public class User {

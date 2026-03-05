@@ -7,5 +7,7 @@ import com.spring.security.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer>{
+
+	User findByUsername(String username);
 	
 }

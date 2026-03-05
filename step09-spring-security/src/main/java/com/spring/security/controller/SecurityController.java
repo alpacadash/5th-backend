@@ -1,9 +1,11 @@
 package com.spring.security.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.spring.security.dto.SignUpRequestDto;
 import com.spring.security.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,7 @@ public class SecurityController {
         return "manager";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/about")
     public String moveAboutPage() {
         return "about";
@@ -46,12 +49,21 @@ public class SecurityController {
 
     @GetMapping("/signup")
     public String moveSignupPage() {
-        return "signUp";
+        return "signup";
     }
 	
 		// 실제 회원가입 -> 회원가입 후 index page로 이동
     @PostMapping("/signup")
-    public String signup() {
-        return "redirect:/";
+    public String signup(SignUpRequestDto dto) {
+    	userService.signUp(dto);
+    	return "redirect:/login";
     }
+    
+    
+    
+    
+    
+    
+    
+    
 }

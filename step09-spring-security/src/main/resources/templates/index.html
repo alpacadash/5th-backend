@@ -1,11 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 	<meta charset="UTF-8">
 	<title>Index Page</title>
 </head>
 <body>
 	<h1>Index Page</h1>
-
+	<div sec:authorize="isAnonymous()">
+		<a href="/login">로그인</a> | <a href="/signup">회원가입</a>
+	</div>
+	<br>
+	<div sec:authorize="isAuthenticated()">
+		<div>
+			안녕하세요, <span sec:authentication="name"></span>님!
+			<form action="/logout" method="POST">
+		        <button>로그아웃</button>
+		    </form>
+		</div>
+		<div>
+			<a sec:authorize="hasRole('USER')" href="/user">유저 페이지</a>
+			<a sec:authorize="hasAnyRole('MANAGER') or hasAnyRole('ADMIN')" href="/manager">매니저 페이지</a>
+			<a sec:authorize="hasAnyRole('ADMIN')" href="/admin">관리자 페이지</a>
+		</div>
+	</div>
+	
+	
 </body>
 </html>
