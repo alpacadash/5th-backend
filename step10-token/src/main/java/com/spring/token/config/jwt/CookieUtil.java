@@ -17,13 +17,29 @@ public class CookieUtil {
      * @param httpOnly JS 접근 차단 여부
      */
     public static Cookie createCookie(String name, String value, int maxAge, boolean httpOnly) {
-        return null;
+    	Cookie cookie = new Cookie(name, value);
+    	
+    	cookie.setHttpOnly(true);
+    	cookie.setSecure(false);
+    	cookie.setPath("/");
+    	cookie.setMaxAge(maxAge);
+    	
+    	return cookie;
     }
 
     /**
      * Request에서 특정 이름의 Cookie 값 추출
      */
     public static String getCookieValue(HttpServletRequest request, String name) {
+    	Cookie[] cookies = request.getCookies();
+    	if(cookies == null) return null;
+    	
+    	for(Cookie cookie : cookies) {
+    		if(name.equals(cookie.getName())) {
+    			return cookie.getValue();
+    		}
+    	}
+    	
         return null;
     }
 
@@ -31,5 +47,10 @@ public class CookieUtil {
      * Cookie 삭제 (maxAge=0으로 덮어씌우기)
      */
     public static void deleteCookie(HttpServletResponse response, String name) {
+    	
+    	Cookie cookie = new Cookie(name, null);
+    	cookie.setMaxAge(0);
+    	cookie.setPath("/");
+    	response.addCookie(cookie);
     }
 }

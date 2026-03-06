@@ -84,9 +84,21 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // JwtUtil로 토큰 생성 (roles 포함)
         String accessToken  = JwtUtil.generateAccessToken(principalDetails);
         String refreshToken = JwtUtil.generateRefreshToken(principalDetails);
-
-        // httpOnly Cookie로 저장
         
+        // httpOnly Cookie로 저장
+        response.addCookie(CookieUtil.createCookie(
+        			JwtProperties.ACCESS_TOKEN_COOKIE,
+        			accessToken,
+        			JwtProperties.ACCESS_TOKEN_EXPIRATION_TIME / 1000,
+        			true
+        		));
+        
+        response.addCookie(CookieUtil.createCookie(
+    			JwtProperties.REFRESH_TOKEN_COOKIE,
+    			accessToken,
+    			JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME / 1000,
+    			true
+    		));
 
         // 클라이언트에 로그인 성공 응답
         response.setStatus(HttpServletResponse.SC_OK);
