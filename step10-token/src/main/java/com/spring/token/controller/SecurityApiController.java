@@ -21,6 +21,7 @@ import com.spring.token.config.jwt.JwtProperties;
 import com.spring.token.config.jwt.JwtUtil;
 import com.spring.token.entity.Users;
 import com.spring.token.repository.UsersRepository;
+import com.spring.token.service.TokenRedisService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,6 +34,7 @@ public class SecurityApiController {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenRedisService tokenRedisService;
 
     // ============================================================
     // 공개 API (permitAll)
@@ -88,8 +90,14 @@ public class SecurityApiController {
         }
 
         try {
-            // Refresh Token 검증
+            // Refresh Token 검증 + Redis 있는 RT 검증
             String username = JwtUtil.getUsername(refreshToken);
+            
+            // Redis RT 일치 검증
+            if(!tokenRedisService.isRefreshTokenValid(username, refreshToken)) {
+            	return ResponseEntity.status(401).body(Map.of("message", "유효하지 않은 토큰"));
+            }
+            
             Users user = usersRepository.findByUsername(username);
 
             if (user == null) {
@@ -98,14 +106,29 @@ public class SecurityApiController {
 
             PrincipalDetails principalDetails = new PrincipalDetails(user);
 
-            // 새 Access Token 발급
+            // 새 Access Token 발급 + 새 RT 발급(기존 Redis에 있는 RT 변경, 쿠키로 다시 전달)
             String newAccessToken = JwtUtil.generateAccessToken(principalDetails);
-
+            String newRefreshToken = JwtUtil.generateRefreshToken(principalDetails);
+            
+            // RT Rotation : Redis RT 교체
+            tokenRedisService.rotateRefreshToken(
+            		username,
+            		newRefreshToken,
+            		JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME / 1000
+            );
+            
             // Cookie 갱신
             response.addCookie(CookieUtil.createCookie(
                     JwtProperties.ACCESS_TOKEN_COOKIE,
                     newAccessToken,
                     JwtProperties.ACCESS_TOKEN_EXPIRATION_TIME / 1000,
+                    true
+            ));
+            
+            response.addCookie(CookieUtil.createCookie(
+                    JwtProperties.REFRESH_TOKEN_COOKIE,
+                    newRefreshToken,
+                    JwtProperties.REFRESH_TOKEN_EXPIRATION_TIME / 1000,
                     true
             ));
 
@@ -121,10 +144,26 @@ public class SecurityApiController {
 
     /**
      * 로그아웃
-     * - Cookie 삭제
+     * - Cookie 삭제 + redis RT 삭제, AT를 BL 등록
      */
     @PostMapping("/auth/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	// AT 존재 확인 -> BL 등록
+    	String accessToken = CookieUtil.getCookieValue(request, JwtProperties.ACCESS_TOKEN_COOKIE);
+    	
+    	if(accessToken != null) {
+    		
+    		// AT를 BL 등록
+    		long remaining = JwtUtil.getRemainingExpiration(accessToken);
+    		tokenRedisService.addToBlackList(accessToken, remaining);
+    		
+    		// RT 삭제
+    		String username = JwtUtil.getUsername(accessToken);
+    		tokenRedisService.deleteRefreshToken(username);
+    	}
+    	
+    	
         CookieUtil.deleteCookie(response, JwtProperties.ACCESS_TOKEN_COOKIE);
         CookieUtil.deleteCookie(response, JwtProperties.REFRESH_TOKEN_COOKIE);
         return ResponseEntity.ok(Map.of("message", "로그아웃 성공"));
