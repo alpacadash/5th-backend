@@ -27,6 +27,7 @@ public class User extends AuditingFields {
     private String email;
     
     @Enumerated(EnumType.STRING)
+//    @Convert(converter = UserRoleTypeConverter.class)
 	@Column(name = "role_type", columnDefinition = "VARCHAR(50)")
     private UserRoleType userRoleType;
     

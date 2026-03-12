@@ -35,7 +35,7 @@ public class Post extends AuditingFields {
 	@Setter
     private String content;
     
-	@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "category_type", columnDefinition = "VARCHAR(50)")
     private CategoryType categoryType;
     
@@ -59,4 +59,11 @@ public class Post extends AuditingFields {
     public static Post of(String title, String content, CategoryType categoryType, User user) {
     	return new Post(title, content, categoryType, user);
     }
+    
+    public void updateTitleAndContentAndCategoryType(String title, String content, CategoryType categoryType) {
+    	this.title = title;
+    	this.content = content;
+    	this.categoryType = categoryType;
+    }
+    
 }
